@@ -3,9 +3,9 @@ messageEnv: 'admin'
 
 
 # when you have just one domain on a server
-domain_name:                "Wls1036"
+domain_name:                "Wls1035"
 domain_adminserver:         "AdminServer"
-domain_adminserver_address: "10.10.10.10"
+domain_adminserver_address: "192.168.231.10"
 domain_adminserver_port:    7001
 domain_nodemanager_port:    5556
 domain_wls_password:        "weblogic1"

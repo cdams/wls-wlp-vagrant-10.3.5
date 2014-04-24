@@ -156,25 +156,33 @@ class ssh {
 
 class java {
   require os
-
   notice 'class java'
 
   $remove = [ "java-1.7.0-openjdk.x86_64", "java-1.6.0-openjdk.x86_64" ]
-
   package { $remove:
     ensure  => absent,
   }
 
-  include jdk7
-
-  jdk7::install7{ 'jdk1.7.0_45':
-      version              => "7u45" , 
-      fullVersion          => "jdk1.7.0_45",
-      alternativesPriority => 18000, 
-      x64                  => true,
-      downloadDir          => hiera('wls_download_dir'),
-      urandomJavaFix       => true,
-      sourcePath           => hiera('wls_source'),
+  if(hiera('java_type_install') == 'jrockit') { 
+    include jrockit
+    jrockit::installrockit { 'jrockit':
+      version         =>  hiera('wls_jrockit_version'),  
+      x64             =>  true, 
+      downloadDir     =>  hiera('wls_download_dir'),
+      puppetMountDir  =>  hiera('wls_source'),
+      urandomJavaFix => true,
+    }   
+  } else {
+    include jdk7
+    jdk7::install7{ 'jdk':
+        version => "7u45" ,
+        fullVersion => hiera('wls_jdk_version'),
+        alternativesPriority => 18000,
+        x64 => true,
+        downloadDir => hiera('wls_download_dir'),
+        urandomJavaFix => true,
+        sourcePath => hiera('wls_source'),
+    }
   }
 
 }

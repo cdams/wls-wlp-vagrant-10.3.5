@@ -5,7 +5,7 @@ messageEnv:     'common'
 
 hosts:
   'admin.example.com':
-    ip:                "10.10.10.10"
+    ip:                "192.168.231.10"
     host_aliases:      - 'admin'
   'node1.example.com':
     ip:                "10.10.10.100"
@@ -19,7 +19,9 @@ hosts:
                        - 'localhost4'
                        - 'localhost4.localdomain4'
 
+java_type_install:        'jrockit'
 wls_jdk_version:          'jdk1.7.0_45'
+wls_jrockit_version:      '1.6.0_45-R28.2.7-4.1.0'
 wls_user_config_dir:      '/home/wls'
 
 # global WebLogic vars
