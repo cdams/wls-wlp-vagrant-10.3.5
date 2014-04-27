@@ -6,16 +6,18 @@
 
 node 'admin.example.com' {
   
-   include os,java, ssh, orautils 
-   include wls1035
-   include wls1035_domain
-   include maintenance
-   
-   Class['os']  -> 
-     Class['ssh']  -> 
-       Class['java']  -> 
-         Class['wls1035'] -> 
-           Class['wls1035_domain']
+  include os,java, ssh, orautils 
+  include wls1035
+  include wls1035_domain
+  include wlp1035
+  include maintenance
+  
+  Class['os']  -> 
+    Class['ssh']  -> 
+      Class['java']  -> 
+        Class['wls1035'] -> 
+          Class['wlp1035'] ->
+            Class['wls1035_domain']
 }  
 
 # operating settings for Middleware
@@ -213,15 +215,6 @@ class wls1035{
     puppetDownloadMntPoint => $puppetDownloadMntPoint,
   }
 
-  Wls::Nodemanager {
-    wlHome       => $osWlHome,
-    fullJDKName  => $jdkWls11gJDK,  
-    user         => $user,
-    group        => $group,
-    serviceName  => $serviceName,  
-    downloadDir  => $downloadDir, 
-  }
-
   Wls::Bsupatch {
     mdwHome                => $osMdwHome,
     wlHome                 => $osWlHome,
@@ -236,6 +229,51 @@ class wls1035{
   # install
   wls::installwls{'11gPS5':
      createUser   => false, 
+  }
+  
+  # weblogic patch
+  # wls::bsupatch{'p17071663':
+     # patchId      => 'BYJ1',    
+     # patchFile    => 'p17071663_1036_Generic.zip',  
+     # require      => Wls::Installwls['11gPS5'],
+  # }
+  
+}
+
+class wlp1035{
+
+   $jdkWls11gJDK  = hiera('wls_jdk_version')
+   $wls11gVersion = hiera('wls_version')
+                       
+   $puppetDownloadMntPoint = hiera('wls_source')                       
+ 
+   $osOracleHome = hiera('wls_oracle_base_home_dir')
+   $osMdwHome    = hiera('wls_middleware_home_dir')
+   $osWlHome     = hiera('wlp_weblogic_home_dir')
+   $osWlsHome     = hiera('wls_weblogic_home_dir')
+   $user         = hiera('wls_os_user')
+   $group        = hiera('wls_os_group')
+   $downloadDir  = hiera('wls_download_dir')
+   $logDir       = hiera('wls_log_dir')     
+
+  # set the defaults
+  Wlp::Installwlp {
+    version                => $wls11gVersion,
+    fullJDKName            => $jdkWls11gJDK,
+    oracleHome             => $osOracleHome,
+    mdwHome                => $osMdwHome,
+    user                   => $user,
+    group                  => $group,    
+    downloadDir            => $downloadDir,
+    remoteFile             => false,
+    puppetDownloadMntPoint => $puppetDownloadMntPoint,
+  }
+
+  # install
+  wlp::installwlp{'portal_1035':
+     createUser   =>  false, 
+     osWlsHome    =>  $osWlsHome,
+     osWlpHome    =>  $osWlHome,
   }
   
   # weblogic patch
