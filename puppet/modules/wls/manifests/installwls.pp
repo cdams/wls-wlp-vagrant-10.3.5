@@ -51,6 +51,9 @@ define wls::installwls( $version                 = undef,
 
    $wls1036Parameter     = "1036"
    $wlsFile1036          = "wls1036_generic.jar"
+   
+   $wls1035Parameter     = "1035"
+   $wlsFile1035          = "wls1035_generic.jar"
 
 
    $wlsFileDefault       = $wlsFile1036
@@ -132,6 +135,9 @@ define wls::installwls( $version                 = undef,
     }
     elsif $version == $wls1212Parameter  {
       $wlsFile    =  $wlsFile1212
+    }
+    elsif $version == $wls1035Parameter  {
+      $wlsFile    =  $wlsFile1035
     }
     elsif $version == $wls1036Parameter  {
       $wlsFile    =  $wlsFile1036

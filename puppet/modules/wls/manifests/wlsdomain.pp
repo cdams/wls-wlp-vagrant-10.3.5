@@ -503,9 +503,11 @@ if ( $continue ) {
                    require => Exec["setDebugFlagOnFalse ${domain} ${title}"],
                  }
               }
+              
               exec { "domain.py ${domain} ${title}":
-                command     => "rm ${path}/domain_${domain}.py",
+                command     => "rm -f ${path}/domain_${domain}.py",
                 require     => Exec["execwlst ${domain} ${title}"],
+                logoutput   => true,
               }
            }
            Solaris: {
@@ -527,7 +529,7 @@ if ( $continue ) {
 				     }
 
              exec { "domain.py ${domain} ${title}":
-                command     => "rm ${path}/domain_${domain}.py",
+                command     => "rm -f ${path}/domain_${domain}.py",
                 require     => Exec["execwlst ${domain} ${title}"],
              }
            }

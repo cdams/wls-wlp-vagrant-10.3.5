@@ -1,7 +1,7 @@
 # jrockit::instalrockit
 
 define jrockit::installrockit( 
-	$version        =  undef , 
+	$fullVersion        =  undef , 
 	$x64            =  undef,
 	$downloadDir    =  '/install/',
 	$puppetMountDir =  undef,
@@ -10,12 +10,13 @@ define jrockit::installrockit(
 	$installJre     =  'true',
 	$setDefault     =  'true',
 	$jreInstallDir  =  '/usr/java',
-  $urandomJavaFix =   false,) {
+  $urandomJavaFix =   false,
+  $user           =  'root',
+  $group          =  'root',) {
 
-	$fullVersion   =  "jrockit-jdk${version}"
 	$installDir    =  "${jreInstallDir}/${fullVersion}"
 
-	notify {"installrockit.pp ${title} ${version}":}
+	notify {"installrockit.pp ${title} ${fullVersion}":}
 
 	if $x64 == true {
 		$type = 'x64'
@@ -27,8 +28,8 @@ define jrockit::installrockit(
 		CentOS, RedHat, OracleLinux, Ubuntu, Debian: { 
 			$installVersion   = "linux"
 			$installExtension = ".bin"
-			$user             = "root"
-			$group            = "root"
+			$userCreation     = "root"
+			$groupCreation    = "root"
       $path             = '/usr/local/bin:/bin:/usr/bin:/usr/local/sbin:/usr/sbin:/sbin:'
 		}
 		windows: {
@@ -40,11 +41,11 @@ define jrockit::installrockit(
 		}
 	}
  
-	$jdkfile =  "jrockit-jdk$version-${installVersion}-${type}${installExtension}"
+	$jdkfile =  "$fullVersion-${installVersion}-${type}${installExtension}"
 
   Exec {
     path => $path,
-    user => $user,
+    user => $userCreation,
   }
   
 	File { 
@@ -60,6 +61,8 @@ define jrockit::installrockit(
 	if ! defined(File[$downloadDir]) {
 		file { $downloadDir :
 			ensure  => directory,
+      owner   => $user,
+      group   => $group,
       require => Exec["create ${$downloadDir} directory"],
 		}
 	}
@@ -84,13 +87,13 @@ define jrockit::installrockit(
 	}
 
 	# install on client 
-	javaexec {"jdkexec ${title} ${version}": 
+	javaexec {"jdkexec ${title} ${fullVersion}": 
 		path        => $downloadDir, 
 		fullversion => $fullVersion,
 		jdkfile     => $jdkfile,
 		setDefault  => $setDefault,
-		user        => $user,
-		group       => $group,
+		user        => $userCreation,
+		group       => $groupCreation,
 		require     => File["${downloadDir}/${jdkfile}"],
 	}
   
@@ -98,7 +101,7 @@ define jrockit::installrockit(
     exec { "set urandom ${fullVersion}":
       command => "sed -i -e's/securerandom.source=file:\\/dev\\/urandom/securerandom.source=file:\\/dev\\/.\\/urandom/g' ${installDir}/jre/lib/security/java.security",
       unless  => "grep '^securerandom.source=file:/dev/./urandom' ${installDir}/jre/lib/security/java.security",
-      require => Javaexec["jdkexec ${title} ${version}"],
+      require => Javaexec["jdkexec ${title} ${fullVersion}"],
     }
   }
 }
