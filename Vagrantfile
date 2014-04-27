@@ -16,6 +16,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     admin.vm.synced_folder "./installer", "/software"
   
     admin.vm.network :private_network, ip: "192.168.231.10"
+    
     if defined? VagrantPlugins::HostsUpdater
       config.hostsupdater.aliases = ["admin"]
     end
