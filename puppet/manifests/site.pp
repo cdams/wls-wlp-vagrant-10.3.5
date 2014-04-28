@@ -6,7 +6,7 @@
 
 node 'admin.example.com' {
   
-  include os,java, ssh, orautils 
+  include os,java, ssh, orautils, maven, wget
   include wls1035
   include wls1035_domain
   include wlp1035
@@ -15,9 +15,11 @@ node 'admin.example.com' {
   Class['os']  -> 
     Class['ssh']  -> 
       Class['java']  -> 
-        Class['wls1035'] -> 
-          Class['wlp1035'] ->
-            Class['wls1035_domain']
+        Class['wget'] ->
+          Class['maven'] ->
+            Class['wls1035'] -> 
+              Class['wlp1035'] ->
+                Class['wls1035_domain']
 }  
 
 # operating settings for Middleware
@@ -183,6 +185,12 @@ class java {
     }
   }
 
+}
+
+class maven {
+  class { "maven::maven":
+    version => '2.2.1',
+  }
 }
 
 class wls1035{
